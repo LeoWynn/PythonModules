@@ -40,7 +40,10 @@ def test3():
 	#
 	print "test3:",timeit.timeit("print_hello()", setup="from __main__ import print_hello")
 	print "test3:",timeit.timeit("print_hello()", setup="from __main__ import print_hello", number=1000)
-		
+	
+def timeit_ctl(func):
+	#default number=1000000, 
+	print func.__name__, " :", timeit.timeit(func)
 
 if  __name__ == "__main__" :
 	#test1()
