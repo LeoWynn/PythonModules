@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+#-*- coding: UTF-8 -*-
+
+
+'''Module: cProfile_usage
+Created by Leo Wen on 2017-07-07 15:18:46
+'''
+
+import cProfile
+import pstats
+import re
+
+# 性能分析装饰器定义
+#http://www.open-open.com/lib/view/open1492052628742.html
+def do_cprofile(filename):
+    """
+        Decorator for function profiling.
+        """
+    def wrapper(func):
+        def profiled_func(*args, **kwargs):
+            # Flag for do profiling or not.
+            DO_PROF = os.getenv("PROFILING")
+            if DO_PROF:
+                profile = cProfile.Profile()
+                profile.enable()
+                result = func(*args, **kwargs)
+                profile.disable()
+                # Sort stat by internal time.
+                sortby = "tottime"
+                ps = pstats.Stats(profile).sort_stats(sortby)
+                ps.dump_stats(filename)
+            else:
+                result = func(*args, **kwargs)
+            return result
+        return profiled_func
+    return wrapper
+
+
+def test():
+    '''Test'''
+    print 'Please test here.'
+    cProfile.run('re.compile("foo|bar")')
+    '''
+        ncalls 表示函数调用的次数（有两个数值表示有递归调用，总调用次数/原生调用次数）
+        tottime 是函数内部调用时间（不包括他自己调用的其他函数的时间）
+        percall 等于 tottime / ncalls
+        cumtime 累积调用时间，与tottime相反，它包含了自己内部调用函数的时间
+        最后一列，文件名，行号，函数名
+    '''
+
+if __name__ == '__main__':
+    test()
